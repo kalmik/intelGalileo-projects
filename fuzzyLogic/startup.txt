@@ -1,0 +1,3 @@
+gcc -o fuzzy fuzzy.c -I /usr/local/libwebsockets/include/ -L /usr/local/libwebsockets/lib/ -lwebsockets -lpthread -w
+
+LD_LIBRARY_PATH=/usr/local/libwebsockets/lib ./fuzzy

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="smoothie.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        var fuzzyValue = 0;
+        var timeValue = 1;
+        
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+        var websocket = new WebSocket('ws://10.13.100.162:9001',
+                                      'dumb-increment-protocol');
+
+        websocket.onopen = function () {
+            $('h1').css('color', 'green');
+        };
+
+        websocket.onerror = function () {
+            $('h1').css('color', 'red');
+        };
+
+        websocket.onmessage = function (message) {
+            var packet = message.data.split('\n');
+            console.log(packet);
+            switch(packet[0])
+            {
+              case 'GET_FUZZY_VALUE_RESPONSE':
+                //fuzzyValue = parseFloat(packet[1]);
+                socketsCallbacks['GET_FUZZY_VALUE_RESPONSE'].element
+                  .trigger('GET_FUZZY_VALUE_RESPONSE',[packet[1]]);
+              break;
+            }
+            
+        };
+
+        socketsCallbacks = {
+          'GET_FUZZY_VALUE_RESPONSE': {
+              element:null,
+              callback: function(event, param){
+                var description = "RETURN CURRENT FUZZY VALUE AND BIND fuzzy-value-chart"
+                if(param)
+                  $(this).attr('data-current-value',param);
+                return description; 
+              }
+          }
+        };
+
+        
+
+        var chart = function(operation,target,config){
+          settings = {
+            width:1140,
+            height:300
+          };
+          if(config)
+            $.extend(config,settings);
+          var _canvas = $("<canvas>").attr({
+            'data-parent-id':$(target).attr("id"),
+            width: settings.width,
+            height: settings.height,
+            'data-current-value':0
+          }).appendTo(target);
+
+          var _smoothie = new SmoothieChart({
+            maxValue:1,
+            minValue:-1,
+            grid: {
+              strokeStyle:'rgb(125, 125, 125)',
+              fillStyle:'rgb(60, 60, 60)',
+              lineWidth: 1,
+              millisPerLine: 250,
+              verticalSections: 6,
+            },
+            labels: {
+              fillStyle:'rgb(255, 255, 255)',
+              fontSize:14
+            }
+          });
+          _lines = [];
+          _lines.push(new TimeSeries());
+          _lines.push(new TimeSeries());
+          _smoothie.streamTo(_canvas[0],1000);
+          
+          var _init = function() {
+            var self = this;
+            socketsCallbacks[operation].element = self.canvas;
+            self.canvas.on(operation,socketsCallbacks[operation].callback);
+            this.interval = setInterval(function() {
+              websocket.send("GET_FUZZY_VALUE");
+              self.lines[0].append(new Date().getTime(),parseFloat(self.canvas.attr('data-current-value')));
+              self.lines[1].append(new Date().getTime(), 0);
+              $(".fuzzy-value").text("FUZZY " + self.canvas.attr('data-current-value'));
+              $(".fuzzy-time").text("TIME: " + ++timeValue + " seconds");
+              $("#monitor1").trigger('teste',['parameter']);
+            }, 1000);
+
+            this.smoothie.addTimeSeries(this.lines[0],{ strokeStyle:'rgb(0, 255, 0)', fillStyle:'rgba(0, 255, 0, 0.4)', lineWidth:3 });
+            this.smoothie.addTimeSeries(this.lines[1],{ strokeStyle:'rgb(155, 155, 0)', lineWidth:1 });
+          }
+          
+
+          return{
+            init: _init,
+            canvas: _canvas,
+            smoothie:_smoothie,
+            lines: _lines,
+            value:0,
+            interval: null
+          }
+        }
+
+        c = new chart('GET_FUZZY_VALUE_RESPONSE',"#monitor1");
+        c.init();
+
+
+        
+
+        
+        // setInterval(function() {
+        //   websocket.send("GET_FUZZY_VALUE");
+        //   line1.append(new Date().getTime(),fuzzyValue);
+        //   lineZero.append(new Date().getTime(), 0);
+        //   $(".fuzzy-value").text("FUZZY " + fuzzyValue);
+        //   $(".fuzzy-time").text("TIME: " + ++timeValue + " seconds");
+        //   $("#monitor1").trigger('teste',['parameter']);
+        // }, 1000);
+
+        // Add to SmoothieChart
+        
+
+
+
+        $('button').click(function(e) {
+          e.preventDefault();
+          websocket.send($('input').val());
+          $('input').val('');
+        });
+      });
+    </script>
+    </head>
+<body>
+    <div class="container" role="tabpanel">
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#monitor1" aria-controls="monitor1" role="tab" data-toggle="tab">DATA 1</a></li>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">DATA 2</a></li>
+        <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">DATA 3</a></li>
+        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">DATA 4</a></li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="monitor1">
+          <br>CUSTOM MONITOR #1<hr>
+          <span class="fuzzy-value"></span><br>
+          <!-- <canvas id="fuzzy-value-chart" width="1140" height="300"></canvas> -->
+          <span class="fuzzy-time"></span><br>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="profile">
+          CUSTOM MONITOR #2<hr>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="messages">CUSTOM MONITOR #3</div>
+        <div role="tabpanel" class="tab-pane" id="settings">CUSTOM MONITOR #4</div>
+      </div>
+
+    </div>
+  </body>
+</html>
+
+
