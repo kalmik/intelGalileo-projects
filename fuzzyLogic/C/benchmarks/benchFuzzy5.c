@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 //FUZZY LIBRARY
-#include "fuzzy.h"
+#include "../lib/fuzzy.h"
 
 int _ONBOARD_ = 0;
 int setGalileo(){

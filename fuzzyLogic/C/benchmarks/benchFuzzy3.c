@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 //FUZZY LIBRARY
-#include "fuzzy.h"
+#include "../lib/fuzzy.h"
 
 int _ONBOARD_ = 0;
 int setGalileo(){
@@ -49,7 +49,7 @@ void runFuzzy(){
 			
 			if(_ONBOARD_) system("echo -n '1' > /sys/class/gpio/gpio27/value");
 
-			rule rules[49] = {
+			rule rules[9] = {
 				{andOp(fuzzify(e,N),fuzzify(ed,N)), &N},
 				{andOp(fuzzify(e,N),fuzzify(ed,Z)), &N},
 				{andOp(fuzzify(e,N),fuzzify(ed,P)), &Z},
@@ -65,7 +65,7 @@ void runFuzzy(){
 
 
 		//-------------------------------
-			out = defuzzify(rules,49);
+			out = defuzzify(rules,9);
 			if(_ONBOARD_) system("echo -n '0' > /sys/class/gpio/gpio27/value");
 	}	
 

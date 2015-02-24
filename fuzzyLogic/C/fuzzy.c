@@ -11,7 +11,7 @@
 //HEADERS FOR THREADS LIBRARY
 #include <pthread.h>
 //FUZZY LIBRARY
-#include "fuzzy.h"
+#include "lib/fuzzy.h"
 //---------------------------------------------------------------------
 #define MINHAPORTA 20000    /* Porta que os usuarios irão se conectar*/
 #define BACKLOG 10     /* Quantas conexões pendentes serão indexadas */
