@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1024px">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="../css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="../js/smoothie.js"></script>
+    <script type="text/javascript" src="../js/wsConfig.js"></script>
+    <script type="text/javascript" src="../js/ED.js"></script>
+    <script type="text/javascript" src="../js/chart.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        var $newMonitorModal = $('#newMonitor');
+        //c = new Chart('GET_FUZZY_VALUE_RESPONSE',"#monitor1");
+        //c.init();
+
+        $newMonitorModal.on('show.bs.modal', function (e) {
+          var $list = $(this).find(".list-group");
+          $list.children().remove();
+          for(var monitor in socketsCallbacks){
+            var m = socketsCallbacks[monitor];
+            var $name = $("<strong>").text(m.name+": ");
+            var $description = $("<span>").text(m.description);
+
+            var $addButton = $("<button>")
+              .addClass("btn btn-sm btn-warning glyphicon glyphicon-plus btn-add-monitor")
+              .attr({
+                'data-operation':monitor
+              })
+              .click(function(){
+                var c = new Chart($(this).attr("data-operation"),$(".monitor-tabs .active a").attr("href"));
+                c.init($(this).attr("data-operation").replace("_RESPONSE",""));
+                monitorInstances.push({
+                  element:$(".monitor-tabs .active a").attr("href"),
+                  operation: $(this).attr("data-operation"),
+                  object:c
+                });
+                $newMonitorModal.find(".close").click();
+              });
+
+            var $buttonColumn = $("<span>").addClass("pull-right").append($addButton);
+            $("<li>")
+              .addClass("list-group-item")
+              .css({lineHeight:"30px"})
+              .append($name)
+              .append($description)
+              .append($buttonColumn)
+              .appendTo($list);
+          }
+        });
+        $(".sync").on('click',function(){
+          $(".monitor-tabs .active a").sync();
+        })
+        
+
+      });
+    </script>
+    </head>
+<body>
+    <div class="container monitor-container" role="tabpanel">
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs monitor-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#monitor1" aria-controls="monitor1" role="tab" data-toggle="tab">DATA 1</a></li>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">DATA 2</a></li>
+        <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">DATA 3</a></li>
+        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">DATA 4</a></li>
+        <li role="presentation"><button class="btn btn-primary pull-left" data-toggle="modal" data-target="#newMonitor" style="margin-top:5px">New Monitor</button></li>
+        <li role="presentation"><button class="btn btn-warning pull-left sync" style="margin-top:5px">Sync</button></li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="monitor1" style="text-align:center"></div>
+        <div role="tabpanel" class="tab-pane" id="profile"></div>
+        <div role="tabpanel" class="tab-pane" id="messages"></div>
+        <div role="tabpanel" class="tab-pane" id="settings"></div>
+      </div>
+
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="newMonitor" tabindex="-1" role="dialog" aria-labelledby="newMonitorLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="newMonitorLabel">Add new Monitor</h4>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group">
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default close" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
+
+
