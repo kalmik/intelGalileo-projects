@@ -119,6 +119,7 @@ void runFuzzy(){
 		//-------------------------------
 			out = defuzzify(rules,49);
 			if(_ONBOARD_) system("echo -n '0' > /sys/class/gpio/gpio27/value");
+			printf("E = %.3f, ED = %.3f Fuzzy = %.3f\n", e, ed, out);
 	}	
 
 }

@@ -85,14 +85,13 @@ void runFuzzy(){
 				{andOp(fuzzify(e,GP),fuzzify(ed,ZZ)), &PP},
 				{andOp(fuzzify(e,GP),fuzzify(ed,PP)), &GP},
 				{andOp(fuzzify(e,GP),fuzzify(ed,GP)), &GP},
-
-				
 			};
 
 
 		//-------------------------------
-			out = defuzzify(rules,49);
+			out = defuzzify(rules,25);
 			if(_ONBOARD_) system("echo -n '0' > /sys/class/gpio/gpio27/value");
+			printf("E = %.3f, ED = %.3f Fuzzy = %.3f\n", e, ed, out);
 	}	
 
 }
