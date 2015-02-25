@@ -42,18 +42,21 @@ void runFuzzy(){
 	float yf = 1;
 	float step = 0.04;
 
-	if(_ONBOARD_) system("echo -n 'out' > /sys/class/gpio/gpio27/direction");
 
-	printf("Starting loop\n");
-	while(1){
-	// 	Regras-------------------------
-			srand(time(NULL));
-			e = rand()%1000;
-			e = (e*2/1000.0)-1;
+	FILE *fp;  
+    char path[25] = "outputs/b7.fsurf";
+    float i,j;
+    if(_ONBOARD_) system("echo -n 'out' > /sys/class/gpio/gpio27/direction");
 
-			srand(time(NULL));
-			ed = rand()%1000;
-			ed = (ed*2/1000.0)-1;
+    fp = fopen(path, "w");
+    fprintf(fp,"xb7=[%.3f:%.3f:%.3f];\nyb7=[%.3f:%.3f:%.3f];\nzb7=[", xi,step,xf-step,yi,step,yf-step);
+    printf("Starting loop\n");
+	for(i=xi;i<=xf;i=i+step){
+       for(j=yi;j<=yf;j=j+step){
+    //while(1){
+    //     Regras-------------------------
+            e = i;
+            ed = j;
 			
 			if(_ONBOARD_) system("echo -n '1' > /sys/class/gpio/gpio27/value");
 
@@ -120,7 +123,12 @@ void runFuzzy(){
 			out = defuzzify(rules,49);
 			if(_ONBOARD_) system("echo -n '0' > /sys/class/gpio/gpio27/value");
 			printf("E = %.3f, ED = %.3f Fuzzy = %.3f\n", e, ed, out);
-	}	
+			fprintf(fp,"%.3f ",out);
+        }
+        fprintf(fp, "\n");
+    }
+    fprintf(fp, "];surf(xb7,yb7,zb7);\nxtitle('FUZZY SURFACE 7MFS');");
+    fclose(fp);
 
 }
 
