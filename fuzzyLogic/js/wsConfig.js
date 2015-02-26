@@ -1,6 +1,6 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-var websocket = new WebSocket('ws://10.13.100.200:9001',
+var websocket = new WebSocket('ws://10.13.100.77:9001',
                               'dumb-increment-protocol');
 
 websocket.onopen = function () {
@@ -13,6 +13,7 @@ websocket.onerror = function () {
 
 websocket.onmessage = function (message) {
     var packet = message.data.split('\n');
+    console.log("data");
     switch(packet[0])
     {
       case 'GET_FUZZY_VALUE_RESPONSE':

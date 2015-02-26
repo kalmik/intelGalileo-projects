@@ -47,7 +47,7 @@ Chart = function(operation,target,config){
   var _lines = [[new TimeSeries(),'rgba(255, 255, 255, alpha)']];
 
   
-  _smoothie.streamTo(_canvas[0],1000);
+  _smoothie.streamTo(_canvas[0],1);
   
   socketsCallbacks[operation].element = _canvas;
   //bind listner
@@ -80,7 +80,7 @@ Chart = function(operation,target,config){
       self.canvas.closest("div").find(".monitor-value").text("VALUE " + valuesStr);
       self.canvas.closest("div").find(".monitor-time").text("TIME: " + ++self.time + " seconds");
       $("#"+self.canvas.attr("data-parent-id")).trigger('teste',['parameter']);
-    }, 1000);
+    }, 1);
 
     
     self.smoothie.addTimeSeries(self.lines[0][0],{ strokeStyle:self.lines[0][1].replace("alpha",'1'), lineWidth:2 });
