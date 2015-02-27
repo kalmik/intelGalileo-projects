@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 //FUZZY LIBRARY
@@ -32,7 +32,7 @@ void runFuzzy(){
     float xf = 1;
     float yi = -1;
     float yf = 1;
-    float step = 0.05;
+    float step = 0.14;
 
     FILE *fp;  
     char path[25] = "outputs/b3.fsurf";

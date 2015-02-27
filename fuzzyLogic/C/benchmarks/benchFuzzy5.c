@@ -38,7 +38,7 @@ void runFuzzy(){
 	float xf = 1;
 	float yi = -1;
 	float yf = 1;
-	float step = 0.04;
+	float step = 0.14;
 
 
 	FILE *fp;  
