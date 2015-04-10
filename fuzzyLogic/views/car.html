@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"></script>
+	<style type="text/css">
+		#world
+		{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background-color: gray;
+			top:0;
+			left: 0;
+		}
+		#floor
+		{
+			position: absolute;
+			width: 100px;
+			height: 200px;
+			background-color: red;
+
+			top:25px;
+			left: 15px;
+		}
+		#car
+		{
+			position: absolute;
+			top:300px;
+			left: 400px;
+			transform-origin:150px 375px;
+		}
+		.wheel
+		{
+			position: absolute;
+			width: 30px;
+			height: 50px;
+			background-color: green;
+		}
+		.wheel.FL{top:0px;left:0px;}
+		.wheel.FR{top:0px;left:100px;}
+		.wheel.BL{top:200px;left:0px;}
+		.wheel.BR{top:200px;left:100px;}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var deltaTime = 30;
+			var angle = 0;
+			var speed_top = 100;
+			var speed = 0;
+			var speed_angle = 0;
+			var dir = 0;
+			var car = {
+				top:$("#car").position().top,
+				left:$("#car").position().left,
+				rotate:0
+			};
+			var loop = null;
+			var move = function(){
+        		car.rotate += (speed_angle) * angle * (deltaTime*0.001);
+        		car.top -= (speed) * Math.cos(Math.PI/180 * angle)*(deltaTime*0.001);
+        		car.left +=  (speed) * Math.sin(Math.PI/180 * angle)*(deltaTime*0.001);
+        		$("#car").css(car);
+			}
+			setInterval(move,deltaTime)
+			$(window).on('keydown',function(e){
+				switch(e.which) {
+			        case 37: // left
+			        	angle = -30;
+			        	$(".wheel.FL").css({rotate:angle});
+			        	$(".wheel.FR").css({rotate:angle});
+			        break;
+
+			        case 38: // up
+			        	speed = speed_top*1;
+			        	speed_angle = 1;
+			        break;
+
+			        case 39: // right
+			        	angle = 30;
+			        	$(".wheel.FL").css({rotate:angle});
+			        	$(".wheel.FR").css({rotate:angle});
+			        break;
+
+			        case 40: // down
+			        	speed = speed_top * (-1);
+			        	speed_angle = -1;
+			        break;
+
+			        default: return; // exit this handler for other keys
+		    	}
+		    	$(window).on('keyup',function(e){
+		    		if(e.which==40 || e.which==38){
+		    			speed = 0;
+		    			speed_angle = 0;
+		    		}
+		    	});
+			});
+		});
+	</script>
+</head>
+<body>
+<section id="world">
+	
+	<div id="car">
+		<div class="wheel FL"></div>
+		<div class="wheel FR"></div>
+		<div class="wheel BL"></div>
+		<div class="wheel BR"></div>
+		<div id="floor"></div>
+	</div>
+</section>
+</body>
+</html>
