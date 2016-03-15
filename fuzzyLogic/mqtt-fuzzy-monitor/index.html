@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
+<script src="./browserMqtt.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script type="text/javascript">
+
+$(function () {
+
+        var chart = null;
+
+        var client = mqtt.connect(
+            "ws://192.168.0.9",
+            {
+                port: 3000,
+            }
+        ); // you add a ws:// url here
+
+        client.subscribe("fuzzy/tx");
+
+        client.on("message", function(topic, payload) {
+            var jsonPart = payload.toString().split('\0')[0];
+            try{
+                var message = JSON.parse(jsonPart);
+                 if(chart) {
+                    var input1 = chart.series[0];
+                    var input2 = chart.series[1];
+                    var output = chart.series[2];
+
+                    var time = (new Date()).getTime();
+                    input1.addPoint([time, +message.input1], true, true);
+                    input2.addPoint([time, +message.input2], true, true);
+                    output.addPoint([time, +message.output], true, true);
+                }
+            } catch(e) {
+                message = payload;
+            }
+            // console.log(message);
+
+
+        });
+
+        client.publish("fuzzy/rx", "hello world!");
+
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
+        $('#container').highcharts({
+            chart: {
+                type: 'spline',
+                //animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+            },
+
+            title: {
+                text: 'Galileo Fuzzy'
+            },
+
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Value'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            plotOptions:{
+                spline:{
+                    marker: {
+                        enabled: false
+                    }
+                }
+            },
+            series: [{
+                name: 'Input 1',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -9; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 0
+                        });
+                    }
+                    return data;
+                }())
+            },{
+                name: 'Input 2',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -9; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 0
+                        });
+                    }
+                    return data;
+                }())
+            },{
+                name: 'Fuzzy Value',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -9; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 0
+                        });
+                    }
+                    return data;
+                }())
+            }]
+        });
+
+    chart =  $('#container').highcharts();
+
+});
+
+</script>
+</body>
+</html>
